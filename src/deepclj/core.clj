@@ -82,5 +82,34 @@
         Y (identity_function A3)]
     Y))
 
+(defn softmax [a]
+  (let [exp_a (exp a)
+        sum_exp_a (sum exp_a)
+        y (/ exp_a / sum_exp_a)]
+    y))
+
+
+
 (defn -main [] 
   (println (test_view_sigmoid)))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
