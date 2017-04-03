@@ -54,5 +54,33 @@
   (view (function-plot sigmoid -5 5)))
 
 
+(defn relu [x]
+  (max 0 x))
+
+
+(defn identity_function [x]
+  x)
+
+(defn sigmoid-matrix [A]
+  (trans (matrix (map sigmoid A))))
+
+(defn test-nn [] 
+  (let [X (trans (matrix [1.0 0.5]))
+        W1 (matrix [[0.1 0.3 0.5] [0.2 0.4 0.6]])
+        B1 (trans (matrix [0.1 0.2 0.3]))
+        A1 (plus (mmult X W1) B1)
+        Z1 (sigmoid-matrix A1)
+
+        W2 (matrix [[0.1 0.4] [0.2 0.5] [0.3 0.6]])
+        B2 (trans (matrix [0.1 0.2]))
+        A2 (plus (mmult Z1 W2) B2)
+        Z2 (sigmoid-matrix A2)
+
+        W3 (matrix [[0.1 0.3] [0.2 0.4]])
+        B3 (trans (matrix [0.1 0.2]))
+        A3 (plus (mmult Z2 W3) B3)
+        Y (identity_function A3)]
+    Y))
+
 (defn -main [] 
   (println (test_view_sigmoid)))
