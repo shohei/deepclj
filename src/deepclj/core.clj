@@ -83,33 +83,19 @@
     Y))
 
 (defn softmax [a]
-  (let [exp_a (exp a)
+  (let [a (matrix a)
+        c (matrix (repeat (length a) (apply max a)))
+        exp_a (exp (minus a c))
         sum_exp_a (sum exp_a)
-        y (/ exp_a / sum_exp_a)]
+        y (div exp_a sum_exp_a)]
     y))
+
+
 
 
 
 (defn -main [] 
   (println (test_view_sigmoid)))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
