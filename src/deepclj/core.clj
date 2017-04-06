@@ -114,8 +114,21 @@
  (let [a (matrix (map #(- (* 1/10 %1) 5) (range 100)))]
   (view (time-series-plot a (softmax a))))
 
-;; (view (function-plot sin -10 10))
-;; (view (function-plot softmax -5 5))
+(require '[incanter.interpolation :refer :all])
+(require '[incanter
+           [charts :as charts]
+           [core :as core]])
+
+(defn plot [fn]
+  (-> (charts/function-plot fn 0 11)
+      (charts/add-points (map first points)
+                         (map second points))
+      (core/view)))
+
+(let [a (matrix (map #(- (* 1/10 %1) 5) (range 100)))
+      y (softmax a)]
+ (binding [points (into [] (map vector a y))]
+  (plot (interpolate points :polynomial))))
 
 
 (defn -main []
