@@ -1,8 +1,8 @@
 (ns deepclj.core
   (:gen-class)
-  (:use (incanter core stats charts io))) 
+  (:use (incanter core stats charts io)))
 (defn AND [x1 x2]
-  (let [x (matrix [x1 x2]) 
+  (let [x (matrix [x1 x2])
         w (matrix [0.5 0.5])
         b -0.7
         tmp (+ (sum (mult w x)) b)]
@@ -64,7 +64,7 @@
 (defn sigmoid-matrix [A]
   (trans (matrix (map sigmoid A))))
 
-(defn test-nn [] 
+(defn test-nn []
   (let [X (trans (matrix [1.0 0.5]))
         W1 (matrix [[0.1 0.3 0.5] [0.2 0.4 0.6]])
         B1 (trans (matrix [0.1 0.2 0.3]))
@@ -82,34 +82,39 @@
         Y (identity_function A3)]
     Y))
 
-(defn softmax [a]
-  (let [exp_a (exp a)
+(defmulti  pre-process class)
+(defmethod pre-process java.lang.Long                [a] (cons a nil))
+(defmethod pre-process java.lang.Double              [a] (cons a nil))
+(defmethod pre-process clojure.lang.PersistentVector [a] (lazy-seq a))
+(defmethod pre-process clatrix.core.Matrix           [a] (lazy-seq a))
+(defmethod pre-process :default                      [a] a)
+
+(defmulti  post-process (fn [a y] [(class a) (class y)])
+(defmethod post-process [java.lang.Long _]                [a y] y)
+(defmethod post-process [java.lang.Double _]              [a y] y)
+(defmethod post-process [clojure.lang.PersistentVector _] [a y] y)
+(defmethod post-process [clatrix.core.Matrix _]           [a y] y)
+(defmethod post-process :default                          [a y] y)
+
+(defn softmax [a']
+  (let [a (pre-process a')
+        c' (apply max a)
+        c (repeat (length a) c')
+        exp_a (exp (minus a c))
         sum_exp_a (sum exp_a)
-        y (/ exp_a / sum_exp_a)]
-    y))
+        y' (div exp_a sum_exp_a)
+        y (post-process a' y')]
+    y)))
+
+(defn softmax-test []
+  (let [a (matrix (map #(- (* 1/10 %1) 5) (range 100)))]
+    (softmax a)))
+
+ (let [a (matrix (map #(- (* 1/10 %1) 5) (range 100)))]
+  (view (time-series-plot a (softmax a))))
+
+(view (function-plot sin -10 10))
 
 
-
-(defn -main [] 
-  (println (test_view_sigmoid)))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+(defn -main []
+  (println "hello"))
