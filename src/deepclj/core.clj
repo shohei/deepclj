@@ -1,6 +1,7 @@
 (ns deepclj.core
   (:gen-class)
   (:use (incanter core stats charts io)))
+
 (defn AND [x1 x2]
   (let [x (matrix [x1 x2])
         w (matrix [0.5 0.5])
@@ -83,18 +84,18 @@
     Y))
 
 (defmulti  pre-process class)
-(defmethod pre-process java.lang.Long                [a] (cons a nil))
+(defmethod pre-process java.lang.Long                [a] (cons (double a) nil))
 (defmethod pre-process java.lang.Double              [a] (cons a nil))
 (defmethod pre-process clojure.lang.PersistentVector [a] (lazy-seq a))
 (defmethod pre-process clatrix.core.Matrix           [a] (lazy-seq a))
 (defmethod pre-process :default                      [a] a)
 
-(defmulti  post-process (fn [a y] [(class a) (class y)])
-(defmethod post-process [java.lang.Long _]                [a y] y)
-(defmethod post-process [java.lang.Double _]              [a y] y)
-(defmethod post-process [clojure.lang.PersistentVector _] [a y] y)
-(defmethod post-process [clatrix.core.Matrix _]           [a y] y)
-(defmethod post-process :default                          [a y] y)
+(defmulti  post-process (fn [a y] [(class a) (class y)]))
+(defmethod post-process [java.lang.Long                clatrix.core.Matrix] [a y] (apply double y))
+(defmethod post-process [java.lang.Double              clatrix.core.Matrix] [a y] (apply double y))
+(defmethod post-process [clojure.lang.PersistentVector clatrix.core.Matrix] [a y] (vec y))
+(defmethod post-process [clatrix.core.Matrix           clatrix.core.Matrix] [a y] y)
+(defmethod post-process :default                                            [a y] y)
 
 (defn softmax [a']
   (let [a (pre-process a')
@@ -104,7 +105,7 @@
         sum_exp_a (sum exp_a)
         y' (div exp_a sum_exp_a)
         y (post-process a' y')]
-    y)))
+    y))
 
 (defn softmax-test []
   (let [a (matrix (map #(- (* 1/10 %1) 5) (range 100)))]
@@ -113,7 +114,9 @@
  (let [a (matrix (map #(- (* 1/10 %1) 5) (range 100)))]
   (view (time-series-plot a (softmax a))))
 
-(view (function-plot sin -10 10))
+;; (view (function-plot sin -10 10))
+;; (view (function-plot softmax -5 5))
+
 
 (defn -main []
   (println "hello"))
