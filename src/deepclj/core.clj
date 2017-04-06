@@ -115,6 +115,5 @@
 
 (view (function-plot sin -10 10))
 
-
 (defn -main []
   (println "hello"))
