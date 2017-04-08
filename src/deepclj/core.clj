@@ -120,7 +120,7 @@
            [core :as core]])
 
 (defn plot [fn]
-  (-> (charts/function-plot fn 0 11)
+  (-> (charts/function-plot fn -5 5)
       (charts/add-points (map first points)
                          (map second points))
       (core/view)))
